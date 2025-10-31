@@ -1,0 +1,42 @@
+import React, { useEffect, useState } from "react";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
+
+export default function Dashboard() {
+  const [revenue, setRevenue] = useState(null);
+  const [sales, setSales] = useState(null);
+  const [channels, setChannels] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/revenue").then(res => res.json()).then(setRevenue);
+    fetch("http://localhost:5000/api/sales").then(res => res.json()).then(setSales);
+    fetch("http://localhost:5000/api/channels").then(res => res.json()).then(setChannels);
+  }, []);
+
+  if (!revenue || !sales || !channels) return <p className="p-6 text-center text-gray-600">Loading data...</p>;
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold mb-6">📊 Admin Dashboard</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold mb-2">Revenue Over Time</h2>
+          <Line data={revenue} />
+        </div>
+
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold mb-2">Product Sales</h2>
+          <Bar data={sales} />
+        </div>
+
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold mb-2">Sales Channels</h2>
+          <Doughnut data={channels} />
+        </div>
+      </div>
+    </div>
+  );
+}
